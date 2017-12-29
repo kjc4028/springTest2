@@ -1,0 +1,56 @@
+package testjc.service.Impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import testjc.dao.TestDao;
+import testjc.service.TestService;
+import testjc.util.ListHelper;
+
+@Service
+public class TestServiceImpl implements TestService {
+	
+	@Autowired
+	private TestDao testDao;
+	
+
+	@Override
+	public void insertTest(Map<String, String> param) throws Exception {
+		testDao.insertTest(param);
+	}
+
+	@Override
+	public Integer totalCount() throws Exception {
+		return testDao.totalCount();
+	}
+
+
+	@Override
+	public List<Map<String, String>> selectTestList() throws Exception {
+		return testDao.selectTestList();
+	}
+
+	@Override
+	public ListHelper helperList(ListHelper listHelper) throws Exception {
+		Map<String, Object> paramMap = listHelper.getParamMap();
+		List<Map<String, String>> list = testDao.helperList(paramMap);
+		listHelper.setList(list);
+		listHelper.setTotalCount(testDao.totalCount());
+		return listHelper;
+	}
+
+	@Override
+	public void updateTest(Map<String, String> param) throws Exception {
+		testDao.updateTest(param);
+	}
+
+	@Override
+	public void deleteTest(Map<String, String> param) throws Exception {
+		testDao.deleteTest(param);
+	}
+
+
+}

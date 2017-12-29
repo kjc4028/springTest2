@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test.sql">
+
+<select id="totalSelect" resultType="int">
+
+	SELECT
+		COUNT(*)
+	FROM
+		TEST
+</select>
+
+<select id="testSelect" parameterType="map" resultType="map">
+		
+	SELECT
+		ROWNUM
+		, A.*
+	FROM
+		(SELECT
+		 	 ID
+			, PW
+			, NAME
+			, AGE
+		FROM 
+			TEST
+		ORDER BY 
+			ID) A
+</select>
+
+<select id="helperList" parameterType="map" resultType="map">
+	<![CDATA[
+	SELECT 
+		B.* 
+	FROM 
+		(SELECT 
+			ROWNUM AS RNUM
+			, A.* 
+		FROM
+			(SELECT * FROM TEST ORDER BY ID) A) B 
+	WHERE 
+			RNUM > #{startNum} 
+		AND RNUM < #{endNum}
+	]]>
+</select>
+
+<insert id="testInsert" parameterType="map">
+	INSERT INTO TEST( 
+	  ID
+	, PW
+	, NAME
+	, AGE
+	) VALUES(
+	 #{userId}
+	,#{password}
+	,#{name}
+	,#{age}
+	)
+</insert>
+</mapper>

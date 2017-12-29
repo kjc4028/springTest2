@@ -1,0 +1,35 @@
+/*app.js*/
+
+/*App객체 생성*/
+var App = window.App || {};
+
+App.test = function(str){
+alert(str);
+};
+
+/*데이터 등록*/
+App.insert = function(){
+	var data =[];
+	var form = App.makeForm('insert');
+	var valuecnt  = $('.inputData').find('input[type=text]');
+	var value = '';
+	for (var i = 0; i < valuecnt.length; i++) {
+	value = $('.inputData').find('input[type=text]');
+	data.push(value);
+	}
+	form.append(data);
+	form.hide();
+	$('body').append(form);
+	form.submit();
+};
+
+/*폼 생성*/
+App.makeForm = function(crud){
+	var form = $('<form />');
+	
+	form.attr('name','testFrm')
+		.attr('action','/test/'+crud)
+		.attr('method','post');
+	
+	return form;
+};

@@ -1,0 +1,49 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="common" uri="/WEB-INF/tld/common.tld" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<html>
+<body>
+
+<h1>
+	home2  
+</h1>
+${proptest}<br>
+<input type="button" value="홈으로" onclick="location.href='/'"> <br>
+
+<form action="test/insert" method="post" name="testFrm">
+	<div class="inputData" id="dataInput">
+		<input class="textInput" type="text" id="userId" name="userId"> <br>
+		<input class="textInput" type="text" id="password" name="password"> <br>
+		<input class="textInput" type="text" id="name" name="name"> <br>
+		<input class="textInput" type="text" id="age" name="age"> <br>
+	</div>
+	<input type="button" id="insertBtn" value="등록" onclick="App.insert();"> <br>
+</form>
+
+<%-- <table class="table">
+	<tr>
+		<td>ID</td> 
+		<td>PW</td> 
+		<td>NAME</td> 
+		<td>AGE</td>
+	</tr>
+	<c:forEach items="${list}" var="list">
+	<tr>
+		<td>${list.ID}</td> 
+		<td>${list.PW}</td> 
+		<td>${list.NAME}</td> 
+		<td>${list.AGE}</td>
+	</tr>
+	</c:forEach>
+</table> --%>
+<br>
+<c:forEach items="${listHelper.list}" var ="listRow">
+${listRow.ID}
+</c:forEach>
+
+<div>
+<common:paging listHelper="${listHelper}" />
+</div>
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+package testjc.util;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.TagSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class PagingTag extends TagSupport {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PagingTag.class);
+			
+	private static final long serialVersionUID = 1L;
+
+	private ListHelper listHelper;
+	
+	private String cssClass = "row";
+	
+	private String firstIcon = "";
+	
+	private String prevIcon = "";
+	
+	private String nextIcon = "";
+	
+/*	private String prevIcon = "<i class=\"fa fa-angle-left\"></i>";
+	
+	private String nextIcon = "<i class=\"fa fa-angle-right\"></i>";
+*/
+	
+	private String lastIcon = "";
+	
+	
+	public String getCssClass() {
+		return cssClass;
+	}
+
+	public void setCssClass(String cssClass) {
+		this.cssClass = cssClass;
+	}
+
+	
+	public ListHelper getListHelper() {
+		return listHelper;
+	}
+
+	public void setListHelper(ListHelper listHelper) {
+		this.listHelper = listHelper;
+	}
+
+	/** @return the firstIcon */
+	public String getFirstIcon() {
+		if( CrmUtil.isEmpty(firstIcon) ) {
+			return "";
+		} else {
+			return this.firstIcon; 
+		}	
+	}
+
+	/** @param firstIcon the firstIcon to set */
+	public void setFirstIcon(String firstIcon) {
+		this.firstIcon = firstIcon;
+	}
+
+	/** @return the prevIcon */
+	public String getPrevIcon() {
+		if( CrmUtil.isEmpty(prevIcon) ) {
+			return "PRE";
+		} else {
+			return this.prevIcon; 
+		}
+	}
+
+	/** @param prevIcon the prevIcon to set */
+	public void setPrevIcon(String prevIcon) {
+		this.prevIcon = prevIcon;
+	}
+
+	/** @return the nextIcon */
+	public String getNextIcon() {
+		if( CrmUtil.isEmpty(nextIcon) ) {
+			return "NEXT";
+		} else {
+			return this.nextIcon; 
+		}
+	}
+
+	/** @param nextIcon the nextIcon to set */
+	public void setNextIcon(String nextIcon) {
+		this.nextIcon = nextIcon;
+	}
+
+	/** @return the lastIcon */
+	public String getLastIcon() {
+		if( CrmUtil.isEmpty(lastIcon) ) {
+			return "";
+		} else {
+			return this.lastIcon; 
+		}
+	}
+
+	/** @param lastIcon the lastIcon to set */
+	public void setLastIcon(String lastIcon) {
+		this.lastIcon = lastIcon;
+	}
+
+
+	public int doStartTag() throws JspException {
+		JspWriter out = pageContext.getOut();
+/*		String contextPath = pageContext.getServletContext().getContextPath();
+		ServletRequest request = pageContext.getRequest();
+		
+		String baseImgPath = contextPath + "/assets/img";*/
+		
+		int totalCount 	= listHelper.getTotalCount();
+		int curPage 	= listHelper.getCurPage();
+		int cntPerPage 	= listHelper.getCntPerPage();
+		int cntPerblock = 10;
+		
+		String url = "";
+		String queryString = "";
+		
+		url = listHelper.getCurUrl();
+		if( !CrmUtil.isEmpty(listHelper.getUrlParam()) )  {
+			queryString = "&amp;" + listHelper.getUrlParam();
+		} 
+		
+		try {
+			
+			int totalPage = 0;
+			int blockNum = 0;
+			int totalBlock = 0;
+
+			// ?Ž˜?´ì§? ?„¤? •?— ?•„?š”?•œ ê°? ?—°?‚°
+			if ( totalCount > 0) {
+
+				if ( totalCount % cntPerPage == 0) {
+					totalPage = (int) ( totalCount / cntPerPage);
+				} else {
+					totalPage = (int) ( totalCount / cntPerPage) + 1;
+				}
+			
+				if ( curPage % cntPerblock == 0) {
+					blockNum = (int)(curPage/cntPerblock);
+				} else {
+					blockNum = (int)(curPage/cntPerblock)+1;
+				}
+				
+				if (totalPage % cntPerblock == 0) {
+					totalBlock = (int) (totalPage / cntPerblock);
+				} else {
+					totalBlock = (int) (totalPage / cntPerblock) + 1;
+				}
+			}
+		
+			
+			/*
+			 
+								<div class="col-md-5 col-sm-12">
+									<div class="dataTables_info" id="sample_3_info">${listHelper.curPage } / ${listHelper.totalPage } (${listHelper.totalCount}ê±?)</div>
+								</div>
+								<div class="col-md-7 col-sm-12">
+									<div class="dataTables_paginate paging_bootstrap">
+										<ul class="pagination" style="visibility: visible;">
+											<li class="prev disabled">
+												<a href="#" title="Prev"><i class="fa fa-angle-left"></i></a>
+											</li>
+											<li class="active"><a href="#">1</a></li>
+											<li><a href="#">2</a></li>
+											<li><a href="#">3</a></li>
+											<li class="next"><a href="#" title="Next"><i class="fa fa-angle-right"></i></a></li>
+										</ul>
+									</div>
+								</div>
+
+			 
+			 */
+			
+			StringBuffer pageBuf = new StringBuffer();
+			//pageBuf.append("<div class=\"" + this.cssClass + "\">\n");
+			if (totalPage > 0) {
+				pageBuf.append("<div class=\"col-md-5 col-sm-12\">\n");
+				pageBuf.append("<div class=\"dataTables_info\" id=\"sample_3_info\">");
+				pageBuf.append( listHelper.getCurPage() );
+				pageBuf.append(" / ");
+				pageBuf.append( listHelper.getTotalPage() );
+				pageBuf.append(" (");
+				pageBuf.append( listHelper.getTotalCount() );
+				pageBuf.append(")</div>\n");
+				pageBuf.append("</div>\n");
+				
+				pageBuf.append("<div class=\"col-md-7 col-sm-12\">\n");
+				pageBuf.append("<div class=\"dataTables_paginate paging_bootstrap\">\n");
+				pageBuf.append("<ul class=\"pagination\" style=\"visibility: visible;\">\n");	
+//				pageBuf.append("<a href=\"").append(url).append("?")
+//						.append( ListHelper.PAGE_PARAM_NAME ).append("=1").append(queryString).append("\" ")
+//						.append("  title=\"ì²˜ìŒ ?Ž˜?´ì§?\" class=\"pre_end\">")
+//						.append( getFirstIcon() + "</a>\n");
+				
+				if (blockNum > 1) {
+					pageBuf.append("<li class=\"prev\">");
+					pageBuf.append("<a href=\"").append(url).append("?")
+						.append( ListHelper.PAGE_PARAM_NAME ).append("=").append( cntPerPage * (blockNum - 1)).append(queryString).append("\" ")
+						.append(" title=\"?´? „  ?Ž˜?´ì§?\">")
+						.append( getPrevIcon() + "</a>\n");
+					pageBuf.append("</li>\n");
+				} else {
+					pageBuf.append("<li class=\"prev disabled\">");
+					pageBuf.append("<a href=\"#none\" title=\"?´? „ ?Ž˜?´ì§?\">");
+					pageBuf.append(getPrevIcon());
+					pageBuf.append("</a>");
+					pageBuf.append("</li>\n");
+				}
+
+
+				for (int i = ((blockNum - 1) * cntPerblock + 1); i <= (blockNum * cntPerblock); i++) {
+					if (i > totalPage) {
+						break;
+					} else {
+						if (i != curPage) {
+							pageBuf.append("<li><a href=\"" ).append(url).append("?curPage=").append(i).append(queryString).append("\" ");
+							pageBuf.append(" 	title=\"" + i + " ?Ž˜?´ì§?\">" + i + "</a></li>\n"); 
+						} else {
+							pageBuf.append("<li class=\"active\"><a href=\"#none\">").append(i).append("</a></li>\n");
+						}
+					}
+				}
+
+				if (blockNum != totalBlock) {
+					pageBuf.append("<li class=\"next\"><a href=\"").append(url).append("?")
+						.append( ListHelper.PAGE_PARAM_NAME )
+						.append("=").append((cntPerPage * blockNum + 1))
+						.append(queryString).append("\" ")
+						.append(" title=\"?‹¤?Œ  ?Ž˜?´ì§?\">")
+						.append( getNextIcon() + "</a></li>\n");
+				} else {
+					pageBuf.append("<li class=\"next disabled\"><a href=\"#none\" title=\"?‹¤?Œ ?Ž˜?´ì§?\">")
+						.append( getNextIcon() )
+						.append("</a></li>\n");
+				}
+				
+//				pageBuf.append("<a href=\"" ).append(url).append("?curPage=").append(totalPage).append(queryString).append("\" ");
+//				pageBuf.append(" 	title=\"ë§ˆì?ë§? ?Ž˜?´ì§?\" class=\"next_end\">");
+//				pageBuf.append( getLastIcon() + "</a>\n");
+				
+			}
+			pageBuf.append("</ul>\n");
+			pageBuf.append("</div>\n");
+			pageBuf.append("</div>");
+//			pageBuf.append("</div>");
+			
+			out.println(pageBuf.toString());
+		} catch(Exception e) {
+			LOGGER.warn("pagingtag error " + e.getMessage());
+			return SKIP_BODY;
+		}
+		return SKIP_BODY;
+	}
+
+}

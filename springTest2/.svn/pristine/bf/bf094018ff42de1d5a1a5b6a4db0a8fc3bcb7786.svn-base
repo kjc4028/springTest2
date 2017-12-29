@@ -1,0 +1,103 @@
+package testjc.controller;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import testjc.service.TestService;
+import testjc.util.ListHelper;
+
+/**
+ * Handles requests for the application home page.
+ */
+@Controller
+public class HomeController {
+	
+	@Autowired
+	private TestService testService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	
+	@Value("#{test['proptest']}") String proptest;
+	
+
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 */
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(Locale locale, Model model) {
+		logger.info("Welcome home! The client locale is {}.", locale);
+		
+		Date date = new Date();
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		
+		String formattedDate = dateFormat.format(date);
+		
+		model.addAttribute("serverTime", formattedDate );
+		
+		return "home";
+	}
+	
+	@RequestMapping(value = "/page2")
+	public String page2(Model model) throws Exception {
+
+		List<Map<String, String>> list = testService.selectTestList();
+		model.addAttribute("list", list);
+		model.addAttribute("proptest", proptest);
+		return "home2";
+	}
+	
+	@RequestMapping(value = "/test/insert", method = RequestMethod.POST)
+	public String testInsert(Model model, @RequestParam Map<String, String> param
+			,HttpServletRequest req) throws Exception {
+		
+		String referer = req.getHeader("referer");
+		System.out.println(referer);
+		System.out.println(param);
+		testService.insertTest(param);
+		
+		return "redirect:"+referer;
+	}
+	
+	@RequestMapping(value="/test/ajaxSelect")
+	public @ResponseBody List<Map<String, String>> ajaxSelect() throws Exception{
+		List<Map<String, String>> list = testService.selectTestList();
+		System.out.println(list);
+		return list;
+	}
+	
+	@RequestMapping(value = "/test/ajaxInsert", method = RequestMethod.POST)
+	public @ResponseBody void ajaxInsert(@RequestParam Map<String, String> param) throws Exception {
+		System.out.println(param);
+		testService.insertTest(param);
+	}
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String selectBplcMastrList(@RequestParam Map<String, String> param, HttpServletRequest request, Model model)
+			throws Exception {
+		System.out.println(param);
+		String curPage = (String) param.get("curPage");
+		request.setAttribute("curPage", curPage);
+		ListHelper listHelper = new ListHelper(request);
+		listHelper = testService.helperList(listHelper);
+		model.addAttribute("listHelper", listHelper);
+		return "home2";
+	}
+	
+}
